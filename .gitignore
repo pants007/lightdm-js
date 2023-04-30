@@ -36,3 +36,6 @@ log/
 
 # Compiled addons (generic)
 *.node
+
+#package.json
+package-lock.json
