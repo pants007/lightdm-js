@@ -1,0 +1,38 @@
+# Compiled binary addons
+/build/
+
+# Dependency directories
+/node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+log/
+
+# macOS metadata
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Compiled addons (windows)
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+
+# Compiled addons (linux)
+*.o
+*.obj
+
+# Compiled addons (macOS)
+*.o
+*.obj
+*.dylib
+
+# Compiled addons (generic)
+*.node
