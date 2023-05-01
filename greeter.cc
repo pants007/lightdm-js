@@ -48,11 +48,12 @@ namespace Greeter {
     return Napi::String::New(info.Env(), status);
   }
   Napi::Value SessionStartSync(const Napi::CallbackInfo& info) {
-    if (info.Length != 1 && !info[0].isString()) {
-      throw Napi::TypeError::New("Expected a string");
+    if (info.Length() != 1 && !info[0].IsString()) {
+      throw Napi::TypeError::New(info.Env(), "Expected a string");
     }
-    auto status = lightdm_greeter_start_session_sync(instance, NULL);
-    return status;
+    std::string session_name = info[0].As<Napi::String>();
+    bool status = lightdm_greeter_start_session_sync(instance, session_name.c_str(), NULL);
+    return Napi::Boolean::New(info.Env(), status);
   }
   Napi::Object Init(Napi::Env env, Napi::Object exports) {
     instance = lightdm_greeter_new();
