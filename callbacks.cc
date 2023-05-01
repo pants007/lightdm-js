@@ -110,15 +110,9 @@ namespace Callbacks {
   }
 
   Napi::Value Release(const Napi::CallbackInfo& info) {
-      if (showPromptCallback != nullptr) {
-          showPromptCallback.Release();
-      }
-      if (showMessageCallback != nullptr) {
-          showMessageCallback.Release();
-      }
-      if (authenticationCompleteCallback != nullptr) {
-          authenticationCompleteCallback.Release();
-      }
+      showPromptCallback.Release();
+      showMessageCallback.Release();
+      authenticationCompleteCallback.Release();
       return info.Env().Undefined();
   }
 
