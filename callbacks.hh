@@ -40,4 +40,8 @@ namespace Callbacks {
   Napi::Value Release(const Napi::CallbackInfo& info);
 
   Napi::Value GetCallbackTypes(const Napi::CallbackInfo& info);
+
+  Napi::Object GEnumToJS(char *name, Napi::Object obj);
+
+  Napi::Object Init(Napi::Env env, Napi::Object exports);
 }

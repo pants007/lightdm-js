@@ -52,5 +52,9 @@ namespace Users {
     }
     return user_array;
   }
+  Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    exports.Set(Napi::String::New(env, "getUsers"), Napi::Function::New(env, Get));
+    return exports;
+  }
   
 }

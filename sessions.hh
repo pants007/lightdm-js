@@ -4,4 +4,5 @@ extern "C" {
 }
 namespace Sessions {  
   Napi::Value Get(const Napi::CallbackInfo& info);
+  Napi::Object Init(Napi::Env env, Napi::Object exports);
 }

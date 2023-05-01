@@ -1,18 +1,26 @@
-var ldm_js = require('bindings')('lightdmjs');
+const ldm_js = require('bindings')('lightdmjs');
+
+const users = ldm_js.getUsers();
+const sessions = ldm_js.getSessions();
+const languages = ldm_js.getLanguages();
+
+const defaultShowPromptCallback = (text, type) => {
+  console.log(text, type)
+}
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 async function doSomething() {
   let callback_types = ldm_js.callbackTypes()
-  ldm_js.setCallback(callback_types.showPromptSignal, (text, type) => {
-    console.log(text)
-    if (text === "login:") {
+  ldm_js.setCallback(callback_types.showPrompt.signal, (text, type) => {
+    console.log(text, type)
+    if (type === callback_types.showPrompt.types.question) {
       ldm_js.authenticationRespond('pants007')
     } else {
       ldm_js.authenticationRespond('niekka007')
     }
   });
-  ldm_js.setCallback(callback_types.authenticationCompleteSignal, () => {
+  ldm_js.setCallback(callback_types.authenticationComplete.signal, () => {
     if (ldm_js.isAuthenticated()) {
       console.log('authentication succesful!')
     } else {
@@ -21,7 +29,10 @@ async function doSomething() {
   })
   ldm_js.connectToDaemonSync()
   ldm_js.authenticationBegin();
-  await sleep(500);
+  await sleep(1000);
   ldm_js.releaseCallbacks()
 }
-doSomething()
+// console.log(ldm_js.callbackTypes())
+// console.log(ldm_js.getHints())
+// doSomething()
+module.exports = { ldm_js }

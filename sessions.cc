@@ -17,4 +17,8 @@ namespace Sessions {
     }
     return session_array;
   }
+  Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    exports.Set(Napi::String::New(env, "getSessions"), Napi::Function::New(env, Get));
+    return exports;
+  }
 }

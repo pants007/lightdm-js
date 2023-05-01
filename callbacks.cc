@@ -11,7 +11,11 @@ namespace Callbacks {
 
   void ShowPromptSetup(Napi::Env env, Napi::Function jsCallback, ShowPromptData *data) {
       auto arg1 = Napi::String::New(env, data->text);
-      auto arg2 = Napi::Number::New(env, data->type);
+      // look up LightDMPromptType for event
+      GType type = g_type_from_name("LightDMPromptType");
+      GEnumClass *enum_class = G_ENUM_CLASS(g_type_class_ref(type));
+      GEnumValue *value = g_enum_get_value(enum_class, data->type);
+      auto arg2 = Napi::String::New(env, value->value_nick);
       jsCallback.Call({arg1, arg2});
       delete[] data->text;
       delete data;
@@ -24,7 +28,11 @@ namespace Callbacks {
   }
   void ShowMessageSetup(Napi::Env env, Napi::Function jsCallback, ShowMessageData *data) {
       auto arg1 = Napi::String::New(env, data->text);
-      auto arg2 = Napi::Number::New(env, data->type);
+      // look up LightDMMessageType for event
+      GType type = g_type_from_name("LightDMMessageType");
+      GEnumClass *enum_class = G_ENUM_CLASS(g_type_class_ref(type));
+      GEnumValue *value = g_enum_get_value(enum_class, data->type);
+      auto arg2 = Napi::String::New(env, value->value_nick);
       jsCallback.Call({arg1, arg2});
       delete[] data->text;
       delete data;
@@ -122,12 +130,50 @@ namespace Callbacks {
 
   Napi::Value GetCallbackTypes(const Napi::CallbackInfo& info) {
     Napi::Object cbTypeObj = Napi::Object::New(info.Env());
-    cbTypeObj.Set("showPromptSignal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_SHOW_PROMPT));
-    cbTypeObj.Set("showMessageSignal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_SHOW_MESSAGE));
-    cbTypeObj.Set("authenticationCompleteSignal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_AUTHENTICATION_COMPLETE));
-    cbTypeObj.Set("autologinTimerExpiredSignal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_AUTOLOGIN_TIMER_EXPIRED));
-    cbTypeObj.Set("idleSignal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_IDLE));
-    cbTypeObj.Set("resetSignal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_RESET));
+    
+    Napi::Object showPromptObject = Napi::Object::New(info.Env());
+    showPromptObject.Set("signal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_SHOW_PROMPT));
+    Napi::Object showPromptTypes = Napi::Object::New(info.Env());
+    showPromptTypes = GEnumToJS("LightDMPromptType", showPromptTypes);
+    showPromptObject.Set("types", showPromptTypes);
+    cbTypeObj.Set("showPrompt", showPromptObject);
+
+    Napi::Object showMessageObject = Napi::Object::New(info.Env());
+    showMessageObject.Set("signal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_SHOW_MESSAGE));
+    Napi::Object showMessageTypes = Napi::Object::New(info.Env());
+    showMessageTypes = GEnumToJS("LightDMMessageType", showMessageTypes);
+    showMessageObject.Set("types", showMessageTypes);
+    cbTypeObj.Set("showMessage", showMessageObject);
+
+    Napi::Object authenticationCompleteObject = Napi::Object::New(info.Env());
+    authenticationCompleteObject.Set("signal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_AUTHENTICATION_COMPLETE));
+    cbTypeObj.Set("authenticationComplete", authenticationCompleteObject);
+    Napi::Object autologinTimerExpiredObject = Napi::Object::New(info.Env());
+    autologinTimerExpiredObject.Set("signal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_AUTOLOGIN_TIMER_EXPIRED));
+    cbTypeObj.Set("autologinTimerExpired", autologinTimerExpiredObject);
+    Napi::Object idleObject = Napi::Object::New(info.Env());
+    idleObject.Set("signal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_IDLE));
+    cbTypeObj.Set("idle", idleObject);
+    Napi::Object resetObject = Napi::Object::New(info.Env());
+    resetObject.Set("signal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_RESET));
+    cbTypeObj.Set("reset", resetObject);
     return cbTypeObj;
+  }
+
+  Napi::Object GEnumToJS(char *name, Napi::Object obj) {
+    GType type = g_type_from_name(name);
+    GEnumClass *enum_class = G_ENUM_CLASS(g_type_class_ref(type));
+    for(int i = 0; i < enum_class->n_values; i++) {
+      GEnumValue enum_value = enum_class->values[i];
+      obj.Set(enum_value.value_nick, enum_value.value);
+    }
+    return obj;
+  }
+
+  Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    exports.Set(Napi::String::New(env, "setCallback"), Napi::Function::New(env, Set));
+    exports.Set(Napi::String::New(env, "releaseCallbacks"), Napi::Function::New(env, Release));
+    exports.Set(Napi::String::New(env, "callbackTypes"), Napi::Function::New(env, GetCallbackTypes));
+    return exports;
   }
 }

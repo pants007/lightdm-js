@@ -8,19 +8,12 @@
 #include "callbacks.hh"
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-  Greeter::init(env);
-  EventLoop::init(env);
-  exports.Set(Napi::String::New(env, "getUsers"), Napi::Function::New(env, Users::Get));
-  exports.Set(Napi::String::New(env, "getLanguages"), Napi::Function::New(env, Languages::Get));
-  exports.Set(Napi::String::New(env, "getSessions"), Napi::Function::New(env, Sessions::Get));
-  exports.Set(Napi::String::New(env, "setCallback"), Napi::Function::New(env, Callbacks::Set));
-  exports.Set(Napi::String::New(env, "releaseCallbacks"), Napi::Function::New(env, Callbacks::Release));
-  exports.Set(Napi::String::New(env, "authenticationBegin"), Napi::Function::New(env, Greeter::AuthenticationBegin));
-  exports.Set(Napi::String::New(env, "authenticationRespond"), Napi::Function::New(env, Greeter::AuthenticationRespond));
-  exports.Set(Napi::String::New(env, "connectToDaemonSync"), Napi::Function::New(env, Greeter::ConnectToDaemonSync));
-  exports.Set(Napi::String::New(env, "isAuthenticated"), Napi::Function::New(env, Greeter::IsAuthenticated));
-  exports.Set(Napi::String::New(env, "inAuthentication"), Napi::Function::New(env, Greeter::InAuthentication));
-  exports.Set(Napi::String::New(env, "callbackTypes"), Napi::Function::New(env, Callbacks::GetCallbackTypes));
+  EventLoop::init(env); // initializes and maintains a GMainLoop, necessary for gobject signals.
+  Greeter::Init(env, exports); // must be called first, initializes the shared LightDMGreeter instance.
+  Users::Init(env, exports); // for now, exports a "getUsers" function.
+  Sessions::Init(env, exports); // for now, exports a "getSessions" function.
+  Languages::Init(env, exports); // for now, exports a "getLanguages" function.
+  Callbacks::Init(env, exports); // everything that has to do with signals and callbacks, minus the event loop.
   return exports;
 }
 
