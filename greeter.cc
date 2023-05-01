@@ -1,12 +1,6 @@
 #include "greeter.hh"
 
 namespace Greeter {
-  Napi::ThreadSafeFunction showPromptCallback;
-  Napi::ThreadSafeFunction showMessageCallback;
-  Napi::ThreadSafeFunction authenticationCompleteCallback;
-  Napi::ThreadSafeFunction autologinTimerExpiredCallback;
-  Napi::ThreadSafeFunction idleCallback;
-  Napi::ThreadSafeFunction resetCallback;
   LightDMGreeter *instance = nullptr;
   Napi::Value ConnectToDaemonSync(const Napi::CallbackInfo& info) {
     return Napi::Boolean::New(info.Env(),lightdm_greeter_connect_to_daemon_sync(instance, NULL));
