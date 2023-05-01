@@ -2,12 +2,12 @@
 #include "callbacks.hh"
 
 namespace Callbacks {
-  Napi::ThreadSafeFunction showPromptCallback = nullptr;
-  Napi::ThreadSafeFunction showMessageCallback = nullptr;
-  Napi::ThreadSafeFunction authenticationCompleteCallback = nullptr;
-  Napi::ThreadSafeFunction autologinTimerExpiredCallback = nullptr;
-  Napi::ThreadSafeFunction idleCallback = nullptr;
-  Napi::ThreadSafeFunction resetCallback = nullptr;
+  Napi::ThreadSafeFunction showPromptCallback = NULL;
+  Napi::ThreadSafeFunction showMessageCallback = NULL;
+  Napi::ThreadSafeFunction authenticationCompleteCallback = NULL;
+  Napi::ThreadSafeFunction autologinTimerExpiredCallback = NULL;
+  Napi::ThreadSafeFunction idleCallback = NULL;
+  Napi::ThreadSafeFunction resetCallback = NULL;
 
   void ShowPromptSetup(Napi::Env env, Napi::Function jsCallback, ShowPromptData *data) {
       auto arg1 = Napi::String::New(env, data->text);
@@ -116,9 +116,9 @@ namespace Callbacks {
   }
 
   Napi::Value Release(const Napi::CallbackInfo& info) {
-      if (showPromptCallback != nullptr) showPromptCallback.Release();
-      if (showMessageCallback != nullptr) showMessageCallback.Release();
-      if (authenticationCompleteCallback != nullptr) authenticationCompleteCallback.Release();
+      if (showPromptCallback != NULL) showPromptCallback.Release();
+      if (showMessageCallback != NULL) showMessageCallback.Release();
+      if (authenticationCompleteCallback != NULL) authenticationCompleteCallback.Release();
       return info.Env().Undefined();
   }
 
