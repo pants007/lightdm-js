@@ -1,9 +1,5 @@
 const ldm_js = require('bindings')('lightdmjs');
 
-const users = ldm_js.getUsers();
-const sessions = ldm_js.getSessions();
-const languages = ldm_js.getLanguages();
-
 const defaultShowPromptCallback = (text, type) => {
   console.log(text, type)
 }
