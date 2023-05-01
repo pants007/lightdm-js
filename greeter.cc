@@ -60,12 +60,13 @@ namespace Greeter {
     if (instance == nullptr) {
       throw Napi::Error::New(env, "Failed to create a new greeter.");
     }
-    exports.Set(Napi::String::New(env, "authenticationBegin"), Napi::Function::New(env, AuthenticationBegin));
-    exports.Set(Napi::String::New(env, "authenticationRespond"), Napi::Function::New(env, AuthenticationRespond));
-    exports.Set(Napi::String::New(env, "connectToDaemonSync"), Napi::Function::New(env, ConnectToDaemonSync));
-    exports.Set(Napi::String::New(env, "isAuthenticated"), Napi::Function::New(env, IsAuthenticated));
-    exports.Set(Napi::String::New(env, "inAuthentication"), Napi::Function::New(env, InAuthentication));
-    exports.Set(Napi::String::New(env, "getHints"), Napi::Function::New(env, GetHints));
+    exports["authenticationBegin"] = Napi::Function::New(env, AuthenticationBegin);
+    exports["authenticationRespond"] = Napi::Function::New(env, AuthenticationRespond);
+    exports["connectToDaemonSync"] = Napi::Function::New(env, ConnectToDaemonSync);
+    exports["sessionStart"] = Napi::Function::New(env, SessionStartSync);
+    exports["isAuthenticated"] = Napi::Function::New(env, IsAuthenticated);
+    exports["inAuthentication"] = Napi::Function::New(env, InAuthentication);
+    exports["getHints"] = Napi::Function::New(env, GetHints);
 
     return exports;
   }

@@ -2,12 +2,12 @@
 #include "callbacks.hh"
 
 namespace Callbacks {
-  Napi::ThreadSafeFunction showPromptCallback = NULL;
-  Napi::ThreadSafeFunction showMessageCallback = NULL;
-  Napi::ThreadSafeFunction authenticationCompleteCallback = NULL;
-  Napi::ThreadSafeFunction autologinTimerExpiredCallback = NULL;
-  Napi::ThreadSafeFunction idleCallback = NULL;
-  Napi::ThreadSafeFunction resetCallback = NULL;
+  Napi::ThreadSafeFunction showPromptCallback = nullptr;
+  Napi::ThreadSafeFunction showMessageCallback = nullptr;
+  Napi::ThreadSafeFunction authenticationCompleteCallback = nullptr;
+  Napi::ThreadSafeFunction autologinTimerExpiredCallback = nullptr;
+  Napi::ThreadSafeFunction idleCallback = nullptr;
+  Napi::ThreadSafeFunction resetCallback = nullptr;
 
   void ShowPromptSetup(Napi::Env env, Napi::Function jsCallback, ShowPromptData *data) {
       auto arg1 = Napi::String::New(env, data->text);
@@ -116,9 +116,9 @@ namespace Callbacks {
   }
 
   Napi::Value Release(const Napi::CallbackInfo& info) {
-      if (showPromptCallback != NULL) showPromptCallback.Release();
-      if (showMessageCallback != NULL) showMessageCallback.Release();
-      if (authenticationCompleteCallback != NULL) authenticationCompleteCallback.Release();
+      if (showPromptCallback != nullptr) showPromptCallback.Release();
+      if (showMessageCallback != nullptr) showMessageCallback.Release();
+      if (authenticationCompleteCallback != nullptr) authenticationCompleteCallback.Release();
       return info.Env().Undefined();
   }
 
@@ -128,14 +128,16 @@ namespace Callbacks {
     Napi::Object showPromptObject = Napi::Object::New(info.Env());
     showPromptObject.Set("signal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_SHOW_PROMPT));
     Napi::Object showPromptTypes = Napi::Object::New(info.Env());
-    showPromptTypes = GEnumToJS("LightDMPromptType", showPromptTypes);
+    std::string showPromptTypeName = std::string("LightDMPromptType");
+    showPromptTypes = GEnumToJS(showPromptTypeName.c_str(), showPromptTypes);
     showPromptObject.Set("types", showPromptTypes);
     cbTypeObj.Set("showPrompt", showPromptObject);
 
     Napi::Object showMessageObject = Napi::Object::New(info.Env());
     showMessageObject.Set("signal", Napi::String::New(info.Env(), LIGHTDM_GREETER_SIGNAL_SHOW_MESSAGE));
     Napi::Object showMessageTypes = Napi::Object::New(info.Env());
-    showMessageTypes = GEnumToJS("LightDMMessageType", showMessageTypes);
+    std::string showMessageTypeName = std::string("LightDMMessageType");
+    showMessageTypes = GEnumToJS(showMessageTypeName.c_str(), showMessageTypes);
     showMessageObject.Set("types", showMessageTypes);
     cbTypeObj.Set("showMessage", showMessageObject);
 
@@ -154,10 +156,10 @@ namespace Callbacks {
     return cbTypeObj;
   }
 
-  Napi::Object GEnumToJS(char *name, Napi::Object obj) {
+  Napi::Object GEnumToJS(const char *name, Napi::Object obj) {
     GType type = g_type_from_name(name);
     GEnumClass *enum_class = G_ENUM_CLASS(g_type_class_ref(type));
-    for(int i = 0; i < enum_class->n_values; i++) {
+    for(unsigned int i = 0; i < enum_class->n_values; i++) {
       GEnumValue enum_value = enum_class->values[i];
       obj.Set(enum_value.value_nick, enum_value.value);
     }
