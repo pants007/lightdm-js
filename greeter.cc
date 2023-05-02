@@ -3,17 +3,28 @@
 namespace Greeter {
   LightDMGreeter *instance = nullptr;
   Napi::Value ConnectToDaemonSync(const Napi::CallbackInfo& info) {
-    return Napi::Boolean::New(info.Env(),lightdm_greeter_connect_to_daemon_sync(instance, NULL));
+    GError *error = NULL;
+    bool connected = lightdm_greeter_connect_to_daemon_sync(instance, &error);
+    if (!connected) {
+      printf("Error connecting to LightDM daemon: %s\n", error->message);
+      g_error_free(error);
+    }
+    return Napi::Boolean::New(info.Env(), connected);
   }
   Napi::Value AuthenticationBegin(const Napi::CallbackInfo& info) {
-    if (info.Length() == 0) {
-      return Napi::Boolean::New(info.Env(), lightdm_greeter_authenticate(instance, NULL, NULL));
-    } else if (info.Length() == 1 && info[0].IsString()) {
-      std::string username = std::string(info[0].As<Napi::String>());
-      return Napi::Boolean::New(info.Env(), lightdm_greeter_authenticate(instance, username.c_str(), NULL));
-    } else {
+    const char *username = NULL;
+    if (info.Length() == 1 && info[0].IsString()) {
+      username = std::string(info[0].As<Napi::String>()).c_str();
+    } else {      
       throw Napi::TypeError::New(info.Env(), "Expected a string");
     }
+    GError *error = NULL;
+    bool begun_authentication = lightdm_greeter_authenticate(instance, username, &error);
+    if (!begun_authentication) {
+      printf("Error beginning user authentication: %s\n", error->message);
+      g_error_free(error);
+    }
+    return Napi::Boolean::New(info.Env(), begun_authentication);
   }
   Napi::Value AuthenticationBeginGuest(const Napi::CallbackInfo& info) {
     bool request_sent = lightdm_greeter_authenticate_as_guest(instance, NULL);
@@ -111,8 +122,8 @@ namespace Greeter {
   }
   Napi::Value SetLanguage(const Napi::CallbackInfo& info) {
     if (info.Length() == 1 && info[0].IsString()) {
-      std::string language = std::string(info[0].As<Napi::String>());
-      bool request_sent = lightdm_greeter_set_language(instance, language.c_str(), NULL);
+      const char *language = std::string(info[0].As<Napi::String>()).c_str();
+      bool request_sent = lightdm_greeter_set_language(instance, language, NULL);
       return Napi::Boolean::New(info.Env(), request_sent);
     } else {
       throw Napi::TypeError::New(info.Env(), "Expected a string");

@@ -15,7 +15,7 @@ namespace Callbacks {
       GType type = g_type_from_name("LightDMPromptType");
       GEnumClass *enum_class = G_ENUM_CLASS(g_type_class_ref(type));
       GEnumValue *value = g_enum_get_value(enum_class, data->type);
-      auto arg2 = Napi::String::New(env, value->value_nick);
+      auto arg2 = Napi::Number::New(env, value->value);
       jsCallback.Call({arg1, arg2});
       delete[] data->text;
       delete data;
@@ -32,7 +32,7 @@ namespace Callbacks {
       GType type = g_type_from_name("LightDMMessageType");
       GEnumClass *enum_class = G_ENUM_CLASS(g_type_class_ref(type));
       GEnumValue *value = g_enum_get_value(enum_class, data->type);
-      auto arg2 = Napi::String::New(env, value->value_nick);
+      auto arg2 = Napi::Number::New(env, value->value);
       jsCallback.Call({arg1, arg2});
       delete[] data->text;
       delete data;
