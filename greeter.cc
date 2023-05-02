@@ -12,10 +12,14 @@ namespace Greeter {
     return Napi::Boolean::New(info.Env(), connected);
   }
   Napi::Value AuthenticationBegin(const Napi::CallbackInfo& info) {
-    const char *username = NULL;
-    if (info.Length() == 1 && info[0].IsString()) {
+    const char *username;
+    if (info.Length() == 0) {
+      username = NULL;
+    }
+    else if (info.Length() == 1 && info[0].IsString()) {
       username = std::string(info[0].As<Napi::String>()).c_str();
-    } else {      
+    } 
+    else {      
       throw Napi::TypeError::New(info.Env(), "Expected a string");
     }
     GError *error = NULL;
@@ -62,8 +66,13 @@ namespace Greeter {
     if (info.Length() != 1 && !info[0].IsString()) {
       throw Napi::TypeError::New(info.Env(), "Expected a string");
     }
+    printf("SessionStartSync\n");
+    GError *error = NULL;
     std::string session_name = info[0].As<Napi::String>();
-    bool status = lightdm_greeter_start_session_sync(instance, session_name.c_str(), NULL);
+    bool status = lightdm_greeter_start_session_sync(instance, session_name.c_str(), &error);
+    if (!status) {
+      printf("%s\n", error->message);
+    }
     return Napi::Boolean::New(info.Env(), status);
   }
   Napi::Object Init(Napi::Env env, Napi::Object exports) {
@@ -74,7 +83,7 @@ namespace Greeter {
     exports["authenticationBegin"] = Napi::Function::New(env, AuthenticationBegin);
     exports["authenticationRespond"] = Napi::Function::New(env, AuthenticationRespond);
     exports["connectToDaemonSync"] = Napi::Function::New(env, ConnectToDaemonSync);
-    exports["sessionStart"] = Napi::Function::New(env, SessionStartSync);
+    exports["sessionStartSync"] = Napi::Function::New(env, SessionStartSync);
     exports["isAuthenticated"] = Napi::Function::New(env, IsAuthenticated);
     exports["inAuthentication"] = Napi::Function::New(env, InAuthentication);
     exports["getHints"] = Napi::Function::New(env, GetHints);
